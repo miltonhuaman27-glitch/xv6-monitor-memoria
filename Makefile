@@ -179,6 +179,8 @@ UPROGS=\
 	_pruebamem\
 	_prueba100\
 _prueba200\
+	_pruebaprog\
+	_pruebaproc\
 	_rm\
 	_sh\
 	_stressfs\
