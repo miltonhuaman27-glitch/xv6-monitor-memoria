@@ -1,111 +1,142 @@
-
 # Monitor de Memoria Física en xv6
 
 ## 1. Descripción del proyecto
 
 Proyecto desarrollado para el curso de Sistemas Operativos de la Universidad Nacional de San Cristóbal de Huamanga (UNSCH).
 
-Consiste en implementar un monitor de memoria física en el sistema operativo educativo xv6, que permite consultar la cantidad de memoria total, utilizada y libre, así como el porcentaje de uso.
+Se implementó una extensión del sistema operativo educativo xv6 (versión x86) para consultar y visualizar el estado de la memoria física. El proyecto incorpora nuevas llamadas al sistema, un monitor de usuario y cinco casos de prueba para evaluar la reserva y liberación de memoria.
 
 ## 2. Objetivo
 
-Implementar y evaluar una extensión funcional de xv6 que permita visualizar el estado de la memoria física mediante nuevas llamadas al sistema.
+Implementar y evaluar un monitor de memoria física en xv6 que muestre la memoria total, utilizada y libre, así como el porcentaje de uso, la cantidad de páginas y el estado de disponibilidad de memoria.
 
 ## 3. Funcionalidades implementadas
 
-- Consulta de memoria física total.
-- Consulta de memoria física libre.
-- Cálculo de memoria utilizada.
-- Cálculo del porcentaje de memoria utilizada.
-- Pruebas de reserva y liberación de memoria.
+- Consulta de memoria física total mediante `gettotalmem()`.
+- Consulta de memoria física libre mediante `getfreemem()`.
+- Cálculo de memoria utilizada y porcentaje de uso.
+- Visualización de la cantidad de páginas de 4 KB.
+- Barra visual de utilización y estado de memoria.
+- Pruebas de reserva, liberación progresiva y recuperación de memoria de procesos.
 
 ## 4. Archivos principales
 
-- `kalloc.c`: incorpora el mecanismo para consultar la memoria libre.
-- `sysproc.c`: contiene las funciones de las nuevas llamadas al sistema.
-- `syscall.c` y `syscall.h`: registran las llamadas al sistema.
-- `defs.h`, `user.h` y `usys.S`: incorporan las declaraciones y conexiones necesarias.
-- `meminfo.c`: muestra la información de memoria.
-- `pruebamem.c`: prueba de reserva y liberación de 40 KB.
-- `prueba100.c`: prueba de reserva y liberación de 100 KB.
-- `prueba200.c`: prueba de reserva y liberación de 200 KB.
-- `Makefile`: incorpora los programas para su compilación.
+| Archivo | Función |
+|---|---|
+| `kalloc.c` | Consulta de páginas libres del asignador físico. |
+| `sysproc.c` | Funciones de las nuevas llamadas al sistema. |
+| `syscall.c`, `syscall.h` | Registro e identificación de llamadas al sistema. |
+| `defs.h`, `user.h`, `usys.S` | Declaraciones y conexiones necesarias. |
+| `meminfo.c` | Monitor de memoria física, versión 2.0. |
+| `pruebamem.c` | Reserva y liberación de 40 KB. |
+| `prueba100.c` | Reserva y liberación de 100 KB. |
+| `prueba200.c` | Reserva y liberación de 200 KB. |
+| `pruebaprog.c` | Reserva y liberación progresiva de hasta 160 KB. |
+| `pruebaproc.c` | Reserva de memoria en un proceso hijo y recuperación al finalizar. |
+| `Makefile` | Inclusión de los programas en la compilación de xv6. |
 
-## 5. Requisitos
+## 5. Entorno de desarrollo
 
-- Ubuntu Linux o Ubuntu mediante WSL.
-- Git.
-- GCC con soporte para compilación de 32 bits.
-- GNU Make.
-- QEMU compatible con xv6 x86.
-- Herramientas de compilación necesarias para xv6.
+- Ubuntu mediante WSL.
+- xv6 x86, basado en el repositorio educativo `mit-pdos/xv6-public`.
+- QEMU para ejecutar xv6.
+- Git y GitHub para el control de versiones y el trabajo colaborativo.
 
-## 6. Descargar el proyecto
+## 6. Compilación y ejecución
 
-```bash
-git clone https://github.com/miltonhuaman27-glitch/xv6-monitor-memoria.git
-cd xv6-monitor-memoria
-```
-
-## 7. Compilar y ejecutar
-
-Para compilar:
+Desde Ubuntu, en la carpeta del repositorio:
 
 ```bash
-make
-```
-
-Para iniciar xv6:
-
-```bash
+make fs.img
 make qemu-nox
 ```
 
-Una vez dentro de xv6, ejecutar:
+Una vez iniciado xv6, ejecutar:
 
 ```text
 meminfo
-```
-
-## 8. Pruebas realizadas
-
-Dentro de xv6, ejecutar:
-
-```text
 pruebamem
 prueba100
 prueba200
+pruebaprog
+pruebaproc
 ```
 
-Resultados observados:
+Para salir de QEMU en modo `nox`, presionar `Ctrl + A` y luego `X`.
 
-| Prueba | Memoria reservada | Memoria libre antes | Memoria libre después de reservar | Memoria libre después de liberar |
-|---|---:|---:|---:|---:|
-| pruebamem | 40 KB | 227160 KB | 227120 KB | 227160 KB |
-| prueba100 | 100 KB | 227160 KB | 227060 KB | 227160 KB |
-| prueba200 | 200 KB | 227160 KB | 226960 KB | 227160 KB |
-
-Los resultados muestran que la memoria libre disminuye al reservar páginas y vuelve a su valor inicial después de liberarlas.
-
-Los valores pueden variar según la configuración y el estado de xv6.
-
-## 9. Resultados del monitor
+## 7. Resultados del monitor
 
 En una ejecución de prueba se obtuvo:
 
-- Memoria total: 228264 KB.
-- Memoria utilizada: 1104 KB.
-- Memoria libre: 227160 KB.
-- Uso de memoria: 0.48 %.
+| Indicador | Resultado |
+|---|---:|
+| Memoria total | 228264 KB |
+| Memoria utilizada | 1104 KB |
+| Memoria libre | 227160 KB |
+| Uso de memoria | 0.48 % |
+| Páginas totales | 57066 |
+| Páginas utilizadas | 276 |
+| Páginas libres | 56790 |
+| Estado | NORMAL |
 
-## 10. Evidencias
+Los valores pueden variar según la configuración y el estado de ejecución de xv6.
 
-Las capturas de compilación, ejecución y pruebas se incorporarán al repositorio del proyecto.
+## 8. Casos de prueba
 
-## 11. Integrantes
+Se realizaron cinco pruebas para verificar la reserva y recuperación de memoria física.
 
-Proyecto desarrollado por dos estudiantes de Ingeniería de Sistemas de la UNSCH.
+| Caso | Programa | Operación | Memoria libre inicial | Memoria libre durante la reserva | Memoria libre final |
+|---|---|---|---:|---:|---:|
+| 1 | `pruebamem` | Reserva de 40 KB | 227160 KB | 227120 KB | 227160 KB |
+| 2 | `prueba100` | Reserva de 100 KB | 227160 KB | 227060 KB | 227160 KB |
+| 3 | `prueba200` | Reserva de 200 KB | 227160 KB | 226960 KB | 227160 KB |
+| 4 | `pruebaprog` | Reserva progresiva de 160 KB | 227160 KB | 227000 KB | 227160 KB |
+| 5 | `pruebaproc` | Proceso hijo con reserva dinámica de 120 KB | 227160 KB | 226760 KB | 227160 KB |
+
+### Prueba 4: reserva progresiva
+
+Se reservaron cinco bloques de 32 KB hasta acumular 160 KB. La memoria libre descendió progresivamente de 227160 KB a 227000 KB. Después de liberar los bloques, regresó a 227160 KB.
+
+Resultado mostrado: `RESULTADO OK: 0 bytes fugados.`
+
+### Prueba 5: recuperación de memoria del proceso hijo
+
+Se utilizó `fork()` para crear un proceso hijo que reservó 120 KB de memoria. Durante la ejecución, la memoria libre descendió a 226760 KB, considerando también los recursos adicionales del proceso. Tras su finalización y recuperación mediante `wait()`, la memoria libre volvió a 227160 KB.
+
+Resultado mostrado: `RESULTADO OK: Kernel libero memoria del hijo.`
+
+## 9. Análisis de resultados
+
+Las cinco pruebas mostraron una disminución de memoria libre durante la reserva y una recuperación hasta el valor inicial después de liberar los recursos. La prueba progresiva verificó el comportamiento del asignador ante varias operaciones consecutivas. La prueba del proceso hijo permitió observar la recuperación de memoria al finalizar su ejecución.
+
+Estos resultados corresponden a las ejecuciones documentadas y no constituyen una garantía de ausencia de fugas en todos los escenarios posibles.
+
+## 10. Informe técnico y evidencias
+
+- [Informe técnico en PDF](documento_TrabajoFinal/Trabajo_Final_xv6.pdf)
+- [Informe editable en Word](documento_TrabajoFinal/Trabajo_Final_xv6.docx)
+- [Carpeta de evidencias](documento_TrabajoFinal/Evidencias)
+
+Las evidencias incluyen capturas de compilación, funcionamiento del monitor y ejecución de las pruebas. Las capturas de las pruebas 4 y 5 se incorporarán a la carpeta cuando estén publicadas.
+
+La presentación de sustentación se añadirá cuando esté terminada.
+
+## 11. Trabajo colaborativo
+
+El proyecto fue desarrollado por dos integrantes del curso de Sistemas Operativos de la UNSCH.
+
+- [miltonhuaman27-glitch](https://github.com/miltonhuaman27-glitch): implementación inicial del monitor, llamadas al sistema, pruebas 1 a 3 y documentación.
+- [juanalvizuri27-hue](https://github.com/juanalvizuri27-hue): mejora del monitor `meminfo` y desarrollo de las pruebas 4 y 5.
+
+Los aportes individuales se pueden revisar en el historial de commits y en la rama `aporte-juan`.
 
 ## 12. Estado del proyecto
 
-El monitor principal y las tres pruebas iniciales funcionan correctamente. El proyecto continuará incorporando las pruebas adicionales y mejoras desarrolladas por el segundo integrante.
+La implementación de ambos integrantes está integrada en la rama `master`. Se verificó la compilación, el arranque de xv6, el funcionamiento de `meminfo` y la ejecución satisfactoria de las pruebas 4 y 5. Las tres pruebas iniciales también cuentan con resultados documentados.
+
+Queda pendiente completar las capturas adicionales y publicar la presentación de sustentación.
+
+## 13. Referencia del sistema base
+
+- MIT PDOS. [xv6-public: código fuente educativo de xv6 para x86](https://github.com/mit-pdos/xv6-public).
+
