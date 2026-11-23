@@ -21,6 +21,7 @@ struct {
   struct spinlock lock;
   int use_lock;
   struct run *freelist;
+  int totalpaginas;
 } kmem;
 
 // Initialization happens in two phases.
@@ -48,8 +49,10 @@ freerange(void *vstart, void *vend)
 {
   char *p;
   p = (char*)PGROUNDUP((uint)vstart);
-  for(; p + PGSIZE <= (char*)vend; p += PGSIZE)
-    kfree(p);
+  for(; p + PGSIZE <= (char*)vend; p += PGSIZE){
+  kfree(p);
+  kmem.totalpaginas++;
+}
 }
 //PAGEBREAK: 21
 // Free the page of physical memory pointed at by v,
@@ -94,3 +97,27 @@ kalloc(void)
   return (char*)r;
 }
 
+
+int
+getfreemem(void)
+{
+  struct run *r;
+  int paginas = 0;
+
+  if(kmem.use_lock)
+    acquire(&kmem.lock);
+
+  for(r = kmem.freelist; r != 0; r = r->next){
+    paginas++;
+  }
+
+  if(kmem.use_lock)
+    release(&kmem.lock);
+
+  return paginas * 4096;
+}
+int
+gettotalmem(void)
+{
+  return kmem.totalpaginas * 4096;
+}

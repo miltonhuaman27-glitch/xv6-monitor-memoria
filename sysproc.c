@@ -89,3 +89,13 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+int
+sys_getfreemem(void)
+{
+  return getfreemem();
+}
+int
+sys_gettotalmem(void)
+{
+  return gettotalmem();
+}
